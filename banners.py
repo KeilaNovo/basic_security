@@ -14,9 +14,9 @@ for host in range (80, 100):# Numero de las maquinas que se van a recorrer
 				banner = socket.recv(1024) # recuperamos el banner que nos devuelve el servidor
 				for vulnbanners in vulnbanners.strip(): # recorremos el listado de banners
 					if banner.strip() is vulnbanners.strip():# Si alguno coincide con el banner que nos a devuelto el servidor, asumimos que hemos encontrado
-						print "We have a winner" + banner           #un servidor que esta ejecutando un servicio  que es vulnerable
-						print "Host:"+ str(sys.argv[1]+'_'+str(host))
-						print "Port:"+str(port)
+						print ("We have a winner" + banner) #un servidor que esta ejecutando un servicio  que es vulnerable
+						print ("Host:"+ str(sys.argv[1]+'_'+str(host)))
+						print ("Port:"+str(port))
 
 		except: 
 			#print 'Error connection to :'tr(sys.argv[1]+'.'+str(host))+':'+ int(port)''

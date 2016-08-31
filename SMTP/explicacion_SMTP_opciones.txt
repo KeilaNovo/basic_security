@@ -1,0 +1,40 @@
+#Explicacion de las opciones que vamos que podemos emplear para el escaneo de puertos y que nos serviran para el script que nos permitira determinar la #existencia de un listado de usuarios en el servidor
+#Servidores de SMTP y servidores de usuarios
+
+#Herramienta que necesitamos : Netcat
+#Comandos que deberemos introducir: nc -v ('Introduce una direccion de IP') : para realizar un escaneo si el puerto esta abierto
+#									nc -v -v :Si se quiere mas informacion de cada uno de los puertos, en el que te dara si la conexion ha sido positiva o #										     no. Tambien se podra obtener el nombre del dominio en el caso de tenerlo y la cantidad de bytes enviados y #                                             recibidos
+#								    vrfy: para verificar si el cliente se encuentra  activo	en la lista.
+#									expn
+#									rcpt to :
+#									Si tenemos la opcion de Kali Linux podremos emplear el comando: netcat. Podremos realizar las mismas operaciones.
+#									Nos dara el dominio asociado a la direccion de IP que le proporcionemos.
+
+#Actualmente,tambien, se puede realizar este tipo de actividad con Nmap. Usaremos los comandos: nmap -A -T4 "URL" 
+#																					   (-A, servira para habilitar la deteccion de SO y su version)
+#																					   (-T4, acelerara el proceso)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Aclaraciones:
+#	Servidor SMTP: traducido es Protocolo de Transferencua de Correo Simple. Este protocolo de texto permite el transporte del email
+#				   atraves de la red. El servidor SMTP es el que se encarga de distribuir los correos desde su origen hasta su destinatario
+#				   final. Por poner un simil, seria como un cartero virtual.
+#				   El protocolo de llamada se realizara mediante: SMPT-AUTH, que servira para la autenticacion de los clientes (agentes MUA) por razones #                  de seguridad
+#				   Puerto por defecto para este tipo de servicios: 25(en caso de estar bloqueado)/587
+#				   Otros puertos en los que se puede escuchar: ej. Microsoft Exchange Server:25/587/465/475/2525, sera uno u otro en funcion del servidor

@@ -1,0 +1,77 @@
+Scapy:
+
+Script escrito mediante el lenguaje de programacion Python, con el que podremos crear o manipular paquetes, escanear, funciones de sniff y un largo etc...
+Tambien podremos realizar nuestros propios scripts en Python valiendonos de ello.
+Programas similares a Scapy : nmap, firewalk,...
+Para poder realizar alguna de las funciones deberemos instalar los paquetes necesarios para ello:
+						-Sistema grafico 2D : MikTex(http://miktex.org/)
+						-Sistemas graficos 3D: Vpython(http://vpython.org/)
+
+Comandos basicos de Scapy:
+1.ls() : lista los protocolos. Estos protocolos (IP, TCP,...) podemos emplearlos junto con el comando "ls" para obtener mas informacion sobre ellos; 
+	     las dos primeras lineas son especificas de cada protocolo
+2.lsc() : Lista los comandos o funciones
+3.Conf : configuramos Scapy
+3.Net()
+4.IP(): mediante este comando y añadiendo str(), podremos convertir la direccion de IP en una cadena de caracteres.
+		Para crear un paquete con los campos de IP propios ===> version= 4 / ihl = 0 / tos = 0 / len = 0/ id = 1 / flags = / frag = 0 / ttl = 64 / 
+																proto = ip / chcksum = 0x0 / src ="Direccion de IP" / dst = Net(Domain Name) / options =
+5.a.show() : mostramos la cabecera del datagrama IP
+6.hexdump(): podremos convertir nuestra direccion de IP en hexadecimal
+7.send(): podremos mandar los paquetes que hayamos creado. En caso, de que queramos enviar mas de una vez el mismo paquete, le colocaremos un 	
+		  multiplicador (ej:*10)
+8.sniff() : para realizar las funciones de sniffer.
+9."variable asignada".nsumnary() : podremos realizar una captura mas exhaustiva de los paquetes. Ej: sniff(filter="tcp and host www.google.es", count=10)
+					 .summary(): no nos devolvera la numeracion de los paquetes.
+10.pdfdump(): este comando nos servira para poder pasar toda la informacion del paquete en el una interfaz grafica, obteniendo un documento pdf.
+11.sprinft():nos permitira dar formato a una cadena volcandola a una variable 
+12.lambda(operador de Python):nos permitira crear funciones anonimas en linea, que no se podran referenciar en ningun otro momento.
+13.iface : con este comando referenciaremos el dispositivo de red que se usara a la hora de realizar la captura.
+14.rdpcap(): mediante este comando podremos realizar lectura de archivos ".pcap"
+15.traceroute: con ello traceremos la ruta por los diferentes hosts de donde pasaran los paquetes de informacion. Ejemplo: 
+																														a,u= traceroute(["www.google.es, www.python.org, ......."])
+
+
+Una de las funciones que podemos realizar, es crear nuestros propios paquetes, de la siguiente manera:
+1.Lo primero que realizaremos sera una impresion de la cabecera del datagrama.
+  Podremos observar que en un principio en la direccion de IP (src) y en el nombre del dominio (dst) nos aparecera la direccion local/localhost (127.0.0.1).
+2.Lo siguiente sera ir rellenando los campo, empezaremos con darle a nuestro paquete una direccion de IP y nombre de dominio : a=IP("www.google.com")
+  y podremos ver los cambios realizados con a.show()
+3. Encapsulamos TCP : a.ttl=12 (modificamos este paramentro) y añadimos la informacion que queremos volviendo a usar una variable ==> b= TCP(dport="25,    
+   80,8080"), en el que declararemos los puertos de fluctuacion de la informacion. c= a/b y mostramos la informacion del protocolo con: c.show()
+4. Seguimos rellenando capas del paquete y aquella informacion que no le precisemos lo rellenara por defecto. Lo siguiente que definiremos seran los FLAGS 
+   TCP SYN + FIN: b= a/TPC(flags='SF') y mostraremos b, nuevamente con b.show()
+
+En caso de querer construir un paquete ICMP, volveremos a los primeros pasos:
+1. Crearemos el paquete, partiremos de la direccion de IP y asignarle el protocolo de ICMP, a=IP(dst='www.google.com')/ICMP.
+2. Para mandarlo, esta vez emplearemos el comando sr1.
+3. Al mostrar la informacion del paquete, aparecera un nuevo campo: ICMP: echo_reply.
+4. Podremos completar el paquete, incluyendo un flag de sincronizacion SYN_SCAN. En caso de que queramos que tenga puertos de origen aleatorio, deberiamos
+   incluir en el protocolo TCP (sport = RandShort())
+
+Otra de las funcionalidades de este script, es la posibilidad de emplearlo como sniffer:
+1.Para ello, emplearemos una variable para poder hacer el llamamiento al comando ====> b= sniff(count=10) (capturaremos 10 paquetes)
+2. Llamando a la variable podremos visualizar a que protocolos a los que pertenecen los paquetes.
+3.Para ver una informacion mas pormenorizada de los paquetes, podremos verlas una por una =====> b[2] (entre los corchetes pondremos el paquete que 
+  queremos visualizar). Si queremos visualizar el protocolo de uno de los paquetes que hemos capturado, añadiremos un corchete mas quedando de la siguiente manera ======> b[2][TCP]. 
+4. Para obtener todavia mas informacion, emplearemos los diferentes comandos explicados en la lineas superiores: sniff(iface="eth0",prn=lambda x:
+   x.summary).
+5.Cuando queremos saltar de una linea a otra, añadiremos \.
+6.Cuando queremos sacar solo un tipo especifico de informacion, deberemos emplear los siguientes comandos : %IP.src% ======> IP de origen
+																								            %IP.dst% ======> IP de destino
+																								            %IP.proto% ====> Protocolo de IP
+  Podemos emplear el mismo tipo de estructura para obtener la informacion de los flags de TCP mediante : %TCP.flags% ======> flags del TCP  
+
+
+
+
+
+
+
+
+
+Protocolo ICMP: Protocolo de Mensajes de Control de Internet. Este es un subprotocolo del protocolo principal IP, que realiza las funciones de control y 
+				notificacion de los errores.
+				Tiene diferentes propositos de los protocolos TCP y UDP, puesto que no es usado directamente por las aplicaciones que utilizan los usuarios.
+				Los comandos ping y traceroute, son los unicos que son empleados para poder determinar si el host se encuentra disponible, gracias a la llamada ECHO que realiza y la respuesta ECHO que recibe en caso de que el host este operativo; dandonos a conocer diferente tipo de informacion, aparte si el host se encuentra operativo; tambien nos informara cuanto tiempo a tardado y por cuantos hosts a pasado para trazar la ruta.
+				Los errores de este produce este protocolo se dirigiran a la IP originaria del envio de paquetes.

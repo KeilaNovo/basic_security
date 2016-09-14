@@ -1,0 +1,50 @@
+Ataque a ARP mediante Scapy (Man in the middle) y posterior ataque DNSspooffing 
+
+1. Mediante herramientas Linux:
+
+arpspoof -i eth0 -t "direccion de IP objetivo" "direccion IP intermediario" (con lo que conseguiremos que todo el flujo de datos pase por
+																			 nuestra direccion IP DE eth0, debido que estaremos envenenando las tablas de ARP con la nueva direccion MAC asociada a nuestra direccion IP)
+
+Para hacerlo en ambos sentidos, asi estaremos realizando un "man in the middle":
+ 
+arspoof -i eth0 -t "direccion IP intermediaria" "direccion IP gateway/objetivo"
+
+*La direccion IP intermediaria sera aquella que nosotros indiquemos.
+
+Con ello, lo que estaremos realizando sera enviar un ARP_reply indicandole al objetivo que la direccion IP que nosotros habremos marcado, estando esta asociada a la direccion fisica de eth0. Haciendo asi que todos los paquetes de datos entre gateway y objetivo pase por nosotros.
+
+Para que nuestra maquina actue como una pasarela, tenemos que realizar un paso previo, que es editar el siguiente fichero de la siguiente manera:
+
+echo 1 > /proc/sys/net/ipv4/ip_forward (con esto la maquina local enrutara los paquetes entre el gateway y victima)
+
+El siguiente paso que deberiamos realizar seria filtrar los paquetes de DNS que envia el gateway para que las respuestas a las peticiones DNS las hagamos nosotros mismos. Para ello emplearemos una serie de comandos iptables ========>recogido en el documento iptables.txt
+
+Con ello, emplearemos la herramienta DNSspoofed para resolver las peticiones DNS del objetivo a una direccion IP arbitraria:
+
+nano DNSspoofed.txt  (fichero en el que indicaremos a que direccion de IP asociaremos los dominios)
+
+Abriremos la direccion de IP en el navegador donde cualquier dominio que vaya a consultar desde la maquina objetivo, dara como respuesta el servidor web que nosotros visualizaremos al abrirlo en el dicho navegador, sera la pagina que sirva nuestro servidor web.
+
+Introduciremos el siguiente comando en la linea de comandos:
+
+dnsspoof -i eth0 -f DNSspoofed.txt
+
+
+Con lo realizado en las primeras lineas estaremos realizando un ataque de "man in the middle" y con las ultimas lineas estaremos realizando DNSspoofing mediante el comando dnsspoof.
+
+Para hacer la verificacion, iriamos a la maquina objetivo y ejecutando el comando "arp", comprobaremos que la direccion IP del gateway estara asociada a la direccion MAC de nuestra interfaz de red. 
+Al realizar la consulta en cualquier dominio, esta sera redirigida a nuestro servidor de web, que se esta ejecutando en dicha direccion de IP.
+
+
+Aclaraciones:
+-Protocolo ARP: protocolo de resolucion de direcciones. Es un protocolo de comunicaciones de la capa de red, responsablede encontrar direccion de hardware
+				(Ethernet MAC) que correnponde a una determinada direccion de IP.
+				El funcionamiento se basa en el envio de un paquete(ARP request) a la direccion de difusion de la red (broadcast, MAC = 00 00 00 00 00 00) que tiene la direccion de IP por la que se pregunta y espera a la maquina en cuestion a que responda (ARP reply) con la direccion de Ethernet que corresponda.
+				La funcion de este protocolo es la encargada de traducir las direcciones de IP a direcciones MAC, habiendo tablas que las relacionan.
+				El protocolo ARP se emplea en cuatro diferentes casos:
+					a) Cuando dos host estan en la misma red y uno quiere enviar un paquete de datos al otro
+					b) Cuando dos host estan en redes diferentesy deben usar un router/gateway para alcanzar al otro host
+					c) Cuando un router necesita enviar un paquete a un host en otro router
+					d) Cuando un router necesita enviar un paquete a un host en la misma red
+-Gateway : puerta de enlace, equipo que sirve para interconectar redes
+-Enrutar : buscar un camino entre todos los posibles en una red de paquetes cuyas tipologias poseen una gran conectividad. Conseguir la mejor ruta.
